@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../services/prisma'; // Importa a instância do Prisma Client
+import prisma from '../services/prisma'; 
 import { hashPassword, comparePassword } from '../utils/password';
 import { generateToken } from '../utils/jwt';
 

@@ -1,40 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api'; // Importa a instância do Axios configurada
+import api from '../services/api'; 
 
-/**
- * Página de registro de novo usuário.
- */
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
-  const [tipo, setTipo] = useState<'0' | '1'>('1'); // Padrão: Usuário Comum ('1')
+  const [tipo, setTipo] = useState<'0' | '1'>('1'); 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  /**
-   * Lida com o envio do formulário de registro.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // Limpa mensagens de erro
-    setMessage(''); // Limpa mensagens de sucesso
+    setError(''); 
+    setMessage(''); 
     try {
-      // Envia os dados do novo usuário para a API de registro
+
       const response = await api.post('/auth/register', { username, password, nome, tipo });
-      setMessage(response.data.message); // Exibe mensagem de sucesso
-      // Opcional: Redireciona para a página de login após um pequeno atraso
+      setMessage(response.data.message); 
       setTimeout(() => navigate('/login'), 2000);
-    } catch (err: unknown) { // <-- CORREÇÃO: 'any' foi trocado por 'unknown' para tipagem segura
-      // Tratamento de erro mais robusto em TypeScript
-      // Verifica se o erro é uma instância de erro do Axios (que tem uma propriedade 'response')
+    } catch (err: unknown) { 
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
-      } else if (err instanceof Error) { // Se for um erro padrão do JavaScript
+      } else if (err instanceof Error) { 
         setError(err.message);
-      } else { // Para qualquer outro tipo de erro desconhecido
+      } else { 
         setError('Ocorreu um erro desconhecido ao registrar usuário.');
       }
     }

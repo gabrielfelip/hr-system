@@ -1,35 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api'; // Importa a instância do Axios configurada
+import api from '../services/api'; 
 
-/**
- * Página para solicitar a recuperação de senha (fluxo simulado).
- */
 const RecoverPasswordPage: React.FC = () => {
-  const [email, setEmail] = useState(''); // Usado como "username" para a simulação
+  const [email, setEmail] = useState(''); 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  /**
-   * Lida com o envio do formulário de recuperação de senha.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // Limpa mensagens de erro
-    setMessage(''); // Limpa mensagens de sucesso
+    setError(''); 
+    setMessage(''); 
     try {
-      // Envia o "email" (username) para a API de recuperação de senha simulada
+
       const response = await api.post('/auth/recover-password', { email });
-      setMessage(response.data.message); // Exibe a mensagem de sucesso/informação
-      setEmail(''); // Limpa o campo
-    } catch (err: unknown) { // <-- CORREÇÃO: 'any' foi trocado por 'unknown' para tipagem segura
-      // Tratamento de erro mais robusto em TypeScript
-      // Verifica se o erro é uma instância de erro do Axios (que tem uma propriedade 'response')
+      setMessage(response.data.message); 
+      setEmail(''); 
+    } catch (err: unknown) { 
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
-      } else if (err instanceof Error) { // Se for um erro padrão do JavaScript
+      } else if (err instanceof Error) { 
         setError(err.message);
-      } else { // Para qualquer outro tipo de erro desconhecido
+      } else { 
         setError('Ocorreu um erro desconhecido ao solicitar a recuperação de senha.');
       }
     }

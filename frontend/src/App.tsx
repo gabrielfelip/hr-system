@@ -5,55 +5,46 @@ import EmployeesPage from './pages/EmployeesPage';
 import RegisterPage from './pages/RegisterPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RecoverPasswordPage from './pages/RecoverPasswordPage';
+import Header from './components/Header';
 
-/**
- * Componente PrivateRoute para proteger rotas.
- * Redireciona para a página de login se não houver um token no localStorage.
- */
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
 };
 
-/**
- * Componente principal da aplicação React que define as rotas.
- */
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* Rotas públicas */}
+      <Routes>    
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/recover-password" element={<RecoverPasswordPage />} />
 
-        {/* Rotas protegidas */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
+        <Route path="/dashboard" element={
+          <PrivateRoute>
+            <Header />
+            <div style={{ paddingTop: '80px', flexGrow: 1 }}> 
               <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/employees"
-          element={
-            <PrivateRoute>
+            </div>
+          </PrivateRoute>
+        } />
+        <Route path="/employees" element={
+          <PrivateRoute>
+            <Header />
+            <div style={{ paddingTop: '80px', flexGrow: 1 }}>
               <EmployeesPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/change-password"
-          element={
-            <PrivateRoute>
+            </div>
+          </PrivateRoute>
+        } />
+        <Route path="/change-password" element={
+          <PrivateRoute>
+            <Header />
+            <div style={{ paddingTop: '80px', flexGrow: 1 }}>
               <ChangePasswordPage />
-            </PrivateRoute>
-          }
-        />
+            </div>
+          </PrivateRoute>
+        } />
 
-        {/* Rota de fallback: redireciona para o login se a URL não for reconhecida */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>

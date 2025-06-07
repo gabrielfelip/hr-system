@@ -1,36 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api'; // Importa a instância do Axios configurada
+import api from '../services/api'; 
 
-/**
- * Página de login do usuário.
- */
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  /**
-   * Lida com o envio do formulário de login.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // Limpa mensagens de erro anteriores
+    setError(''); 
     try {
-      // Envia as credenciais para a API de login
+     
       const response = await api.post('/auth/login', { username, password });
-      localStorage.setItem('token', response.data.token); // Armazena o token JWT
-      localStorage.setItem('user', JSON.stringify(response.data.user)); // Armazena informações do usuário
-      navigate('/dashboard'); // Redireciona para o dashboard
-    } catch (err: unknown) { // <-- CORREÇÃO AQUI: 'any' foi trocado por 'unknown'
-      // Tratamento de erro mais robusto em TypeScript
-      // Verifica se o erro é uma instância de erro do Axios (que tem uma propriedade 'response')
+      localStorage.setItem('token', response.data.token); 
+      localStorage.setItem('user', JSON.stringify(response.data.user)); 
+      navigate('/dashboard'); 
+    } catch (err: unknown) { 
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
-      } else if (err instanceof Error) { // Se for um erro padrão do JavaScript
+      } else if (err instanceof Error) { 
         setError(err.message);
-      } else { // Para qualquer outro tipo de erro desconhecido
+      } else { 
         setError('Ocorreu um erro desconhecido ao fazer login.');
       }
     }

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,34 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelo para a tabela de usuários (baseado na especificação do PDF)
 model Usuario {
-  username     String   @id @db.VarChar(30) // Chave primária
-  password     String   @db.VarChar(128)    // Senha criptografada
+  username     String   @id @db.VarChar(30) 
+  password     String   @db.VarChar(128)    
   nome         String   @db.VarChar(120)
-  tipo         String   @db.Char(1)         // '0' para Administrador, '1' para Usuário Comum
-  status       String   @db.Char(1)         // 'A' para Ativo, 'I' para Inativo, 'B' para Bloqueado
-  quantAcesso  Int?     @map("quant_acesso") @db.Integer // Quantidade de acessos
-  createdAt    DateTime @default(now()) @map("created_at") // Data de criação do registro
-  updatedAt    DateTime @updatedAt @map("updated_at")     // Data da última atualização do registro
+  tipo         String   @db.Char(1)         
+  status       String   @db.Char(1)         
+  quantAcesso  Int?     @map("quant_acesso") @db.Integer 
+  createdAt    DateTime @default(now()) @map("created_at") 
+  updatedAt    DateTime @updatedAt @map("updated_at")     
 
-  @@map("Usuarios") // Mapeia o nome do modelo para o nome da tabela no banco de dados
+  @@map("Usuarios") 
 }
 
-// Modelo para a tabela de funcionários (entidade CRUD)
+
 model Funcionario {
-  id              Int      @id @default(autoincrement()) // Chave primária auto-incrementável
+  id              Int      @id @default(autoincrement()) 
   nome            String   @db.VarChar(255)
   sobrenome       String   @db.VarChar(255)
-  email           String   @unique @db.VarChar(255)       // E-mail único
-  telefone        String?  @db.VarChar(20)                // Opcional
-  dataContratacao DateTime @map("data_contratacao") @db.Date // Data de contratação (apenas a data)
+  email           String   @unique @db.VarChar(255)       
+  telefone        String?  @db.VarChar(20)                
+  dataContratacao DateTime @map("data_contratacao") @db.Date 
   cargo           String   @db.VarChar(100)
   departamento    String   @db.VarChar(100)
-  salario         Decimal  @db.Decimal(10, 2)             // <-- AQUI ESTÁ A CORREÇÃO: AGORA É Decimal
-  status          String   @default("A") @db.Char(1)      // 'A' para Ativo, 'I' para Inativo
-  criadoEm        DateTime @default(now()) @map("criado_em") // Data de criação do registro
-  atualizadoEm    DateTime @updatedAt @map("atualizado_em")     // Data da última atualização do registro
+  salario         Decimal  @db.Decimal(10, 2)             
+  status          String   @default("A") @db.Char(1)      
+  criadoEm        DateTime @default(now()) @map("criado_em") 
+  atualizadoEm    DateTime @updatedAt @map("atualizado_em")     
 
-  @@map("Funcionarios") // Mapeia o nome do modelo para o nome da tabela no banco de dados
+  @@map("Funcionarios") 
 }
