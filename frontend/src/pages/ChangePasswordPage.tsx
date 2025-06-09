@@ -1,34 +1,156 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api'; 
-
+import api from '../services/api';
 
 const ChangePasswordPage: React.FC = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  
+  const [error, setError] = useState(''); // Erro geral de submissão
+  const [message, setMessage] = useState(''); // Mensagem de sucesso
+  const [loading, setLoading] = useState(false); // Estado de carregamento
+
+  // Estados para validação de campos individuais
+  const [newPasswordError, setNewPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
+  
+  // Novo estado para os requisitos da senha
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    minChars: false,
+    hasUpper: false,
+    hasLower: false,
+    hasNumber: false,
+    hasSpecial: false,
+    notCurrent: false, 
+  });
+
+  // Função para avaliar os requisitos da senha
+  const checkPasswordRequirements = (password: string, oldPassword: string) => {
+    const reqs = {
+      minChars: password.length >= 8,
+      hasUpper: /[A-Z]/.test(password),
+      hasLower: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[^A-Za-z0-9]/.test(password),
+      // A nova senha não deve ser igual à atual, e não pode ser vazia
+      notCurrent: password.length > 0 && password !== oldPassword, 
+    };
+    setPasswordRequirements(reqs);
+
+    // Ajusta newPasswordError para requisitos não cumpridos ou outros erros
+    if (password.length > 0 && !reqs.minChars) {
+        setNewPasswordError('A senha deve ter pelo menos 8 caracteres.');
+    } else if (password.length > 0 && !reqs.hasUpper && !reqs.hasLower && !reqs.hasNumber && !reqs.hasSpecial) {
+        setNewPasswordError('A senha precisa de mais complexidade.');
+    } else {
+        setNewPasswordError(null); // Limpa erro específico de nova senha se os requisitos básicos de formato estiverem OK
+    }
+    // O erro de "não pode ser igual à senha atual" será validado no `validateForm` também.
+  };
+
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewPassword(value);
+    checkPasswordRequirements(value, currentPassword);
+    if (confirmNewPassword && value !== confirmNewPassword) {
+      setConfirmPasswordError('As senhas não coincidem.');
+    } else {
+      setConfirmPasswordError(null);
+    }
+    setError('');
+  };
+
+  const handleConfirmNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmNewPassword(value);
+    if (newPassword && value !== newPassword) {
+      setConfirmPasswordError('As senhas não coincidem.');
+    } else {
+      setConfirmPasswordError(null);
+    }
+    setError('');
+  };
+
+  const handleCurrentPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCurrentPassword(value);
+    // Recalcula requisitos da nova senha pois a senha atual pode ter mudado
+    checkPasswordRequirements(newPassword, value); 
+    setError('');
+  };
+
+
+  const validateForm = () => {
+    let isValid = true;
+    
+    setNewPasswordError(null);
+    setConfirmPasswordError(null);
+    setError('');
+
+    if (!currentPassword.trim()) {
+        setError('A senha atual é obrigatória.');
+        isValid = false;
+    }
+
+    // Re-avalia requisitos da nova senha para a validação final
+    checkPasswordRequirements(newPassword, currentPassword);
+    
+    const allRequirementsMet = 
+        passwordRequirements.minChars && 
+        passwordRequirements.hasUpper && 
+        passwordRequirements.hasLower && 
+        passwordRequirements.hasNumber && 
+        passwordRequirements.hasSpecial &&
+        passwordRequirements.notCurrent; 
+
+    if (!newPassword.trim()) { // Verifica se a nova senha está vazia ou só com espaços
+        setNewPasswordError('A nova senha é obrigatória.');
+        isValid = false;
+    } else if (!allRequirementsMet) {
+        setNewPasswordError('A nova senha não atende a todos os requisitos.');
+        isValid = false;
+    }
+
+    if (!confirmNewPassword.trim()) {
+      setConfirmPasswordError('A confirmação da nova senha é obrigatória.');
+      isValid = false;
+    } else if (newPassword !== confirmNewPassword) {
+      setConfirmPasswordError('As senhas não coincidem.');
+      isValid = false;
+    } 
+    
+    if (!isValid) {
+        setError('Por favor, corrija os erros no formulário.');
+    }
+
+    return isValid;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); 
     setMessage(''); 
 
-    if (newPassword !== confirmNewPassword) {
-      setError('A nova senha e a confirmação não coincidem.');
-      return;
+    if (!validateForm()) {
+      return; 
     }
-
+    
+    setLoading(true); 
     try {
-      
       const response = await api.post('/auth/change-password', { currentPassword, newPassword });
       setMessage(response.data.message); 
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      setNewPasswordError(null);
+      setConfirmPasswordError(null);
+      setPasswordRequirements({ // Reseta os requisitos para o estado inicial (false)
+        minChars: false, hasUpper: false, hasLower: false, hasNumber: false, hasSpecial: false, notCurrent: false
+      });
+
+      setTimeout(() => navigate('/dashboard'), 2000); 
     } catch (err: unknown) { 
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
@@ -37,21 +159,32 @@ const ChangePasswordPage: React.FC = () => {
       } else { 
         setError('Ocorreu um erro desconhecido ao alterar a senha.');
       }
+    } finally {
+      setLoading(false); 
     }
   };
 
+  // Componente auxiliar para exibir um requisito de senha
+  const RequirementItem: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
+    <li style={{ display: 'flex', alignItems: 'center', color: met ? '#28a745' : '#6c757d', marginBottom: '5px' }}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+        {met ? (
+          <polyline points="20 6 9 17 4 12" /> // Checkmark
+        ) : (
+          <circle cx="12" cy="12" r="10" /> // Círculo vazio
+        )}
+      </svg>
+      {text}
+    </li>
+  );
+
   return (
-    //container principal da página
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh', 
-      background: 'linear-gradient(to bottom right, #f0f4f8, #e0e7ed)', 
-      padding: '20px'
+      justifyContent: 'center',      
     }}>
-      // Container do Card Principal 
       <div style={{
         padding: '30px', 
         maxWidth: '500px', 
@@ -113,52 +246,99 @@ const ChangePasswordPage: React.FC = () => {
         {message && <p style={{ color: '#28a745', marginBottom: '15px', textAlign: 'center', fontWeight: 'bold' }}>{message}</p>}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px', textAlign: 'left' }}>
+          <div style={{ marginBottom: '15px', textAlign: 'left', position: 'relative' }}>
             <label htmlFor="currentPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#555' }}>Senha Atual:</label>
             <input
               type="password"
               id="currentPassword"
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              onChange={handleCurrentPasswordChange} 
+              onBlur={() => { // Valida ao sair
+                if (!currentPassword.trim()) setError('A senha atual é obrigatória.');
+                else setError('');
+              }}
               required
               placeholder="Digite sua senha atual"
-              style={{ width: 'calc(100% - 16px)', padding: '10px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '5px' }}
+              style={{ 
+                width: '100%', 
+                padding: '10px', 
+                border: `1px solid ${error.includes('senha atual') ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                borderRadius: '5px', 
+                marginTop: '5px' 
+              }}
             />
+             {error.includes('senha atual') && <p style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '5px' }}>{error}</p>}
           </div>
-          <div style={{ marginBottom: '15px', textAlign: 'left' }}>
+
+          <div style={{ marginBottom: '15px', textAlign: 'left', position: 'relative' }}>
             <label htmlFor="newPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#555' }}>Nova Senha:</label>
             <input
               type="password"
               id="newPassword"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={handleNewPasswordChange}
+              onBlur={() => checkPasswordRequirements(newPassword, currentPassword)} // Avalia requisitos ao sair
               required
               placeholder="Crie sua nova senha"
-              style={{ width: 'calc(100% - 16px)', padding: '10px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '5px' }}
+              style={{ 
+                width: '100%', 
+                padding: '10px', 
+                border: `1px solid ${newPasswordError ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                borderRadius: '5px', 
+                marginTop: '5px' 
+              }}
             />
+            {newPasswordError && <p style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '5px' }}>{newPasswordError}</p>}
+            
+            {/* Lista de Requisitos da Senha - SEMPRE VISÍVEL */}
+            <ul style={{ listStyle: 'none', padding: '10px 0 0 0', margin: '0', fontSize: '0.9rem' }}>
+                <RequirementItem met={passwordRequirements.minChars} text="Pelo menos 8 caracteres" />
+                <RequirementItem met={passwordRequirements.hasUpper} text="Pelo menos 1 letra maiúscula" />
+                <RequirementItem met={passwordRequirements.hasLower} text="Pelo menos 1 letra minúscula" />
+                <RequirementItem met={passwordRequirements.hasNumber} text="Pelo menos 1 número" />
+                <RequirementItem met={passwordRequirements.hasSpecial} text="Pelo menos 1 caractere especial" />
+                <RequirementItem met={passwordRequirements.notCurrent} text="Não pode ser igual à senha atual" />
+            </ul>
           </div>
-          <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+
+          <div style={{ marginBottom: '20px', textAlign: 'left', position: 'relative' }}>
             <label htmlFor="confirmNewPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#555' }}>Confirmar Nova Senha:</label>
             <input
               type="password"
               id="confirmNewPassword"
               value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              onChange={handleConfirmNewPasswordChange}
+              onBlur={() => { // Valida ao sair
+                if (newPassword !== confirmNewPassword) {
+                  setConfirmPasswordError('As senhas não coincidem.');
+                } else {
+                  setConfirmPasswordError(null);
+                }
+              }}
               required
               placeholder="Confirme sua nova senha"
-              style={{ width: 'calc(100% - 16px)', padding: '10px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '5px' }}
+              style={{ 
+                width: '100%', 
+                padding: '10px', 
+                border: `1px solid ${confirmPasswordError ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                borderRadius: '5px', 
+                marginTop: '5px' 
+              }}
             />
+            {confirmPasswordError && <p style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '5px' }}>{confirmPasswordError}</p>}
           </div>
+
           <button
             type="submit"
+            disabled={loading} // Desabilita o botão durante o carregamento
             style={{
               width: '100%',
               padding: '15px 20px', 
-              backgroundColor: '#059669', 
+              backgroundColor: loading ? '#6c757d' : '#059669', // Mudar cor durante o carregamento
               color: 'white',
               border: 'none',
               borderRadius: '8px', 
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer', // Mudar cursor durante o carregamento
               fontSize: '1.1rem', 
               fontWeight: 'bold',
               transition: 'background-color 0.3s ease, transform 0.2s ease',
@@ -168,11 +348,11 @@ const ChangePasswordPage: React.FC = () => {
               justifyContent: 'center',
               gap: '10px'
             }}
-            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#047857'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            onMouseOver={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#047857'; e.currentTarget.style.transform = 'translateY(-3px)'; }}}
+            onMouseOut={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.transform = 'translateY(0)'; }}}
           >
+            {loading ? 'Alterando...' : 'Alterar Senha'} {/* Texto do botão durante o carregamento */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Alterar Senha
           </button>
         </form>
       </div>
