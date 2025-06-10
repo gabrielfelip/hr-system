@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Importe useNavigate
+import { useNavigate, Link } from 'react-router-dom'; 
 import api from '../services/api';
 
 interface ValidationErrors {
@@ -7,18 +7,18 @@ interface ValidationErrors {
 }
 
 const RecoverPasswordPage: React.FC = () => {
-  const navigate = useNavigate(); // Use o hook useNavigate
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false); // Estado de carregamento
+  const [loading, setLoading] = useState(false); 
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const validateField = (name: keyof ValidationErrors, value: string) => {
     let errorMessage = '';
     if (!value.trim()) {
       errorMessage = 'Campo obrigatório.';
-    } else if (name === 'email' && !/\S+@\S+\.\S+/.test(value)) { // Validação de formato de email
+    } else if (name === 'email' && !/\S+@\S+\.\S+/.test(value)) { 
         errorMessage = 'Formato de email inválido.';
     }
     setValidationErrors((prev) => ({ ...prev, [name]: errorMessage }));
@@ -28,7 +28,7 @@ const RecoverPasswordPage: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEmail(value);
-    setError(''); // Limpa erro geral ao digitar
+    setError(''); 
     validateField(name as keyof ValidationErrors, value);
   };
 
@@ -39,9 +39,7 @@ const RecoverPasswordPage: React.FC = () => {
 
   const validateForm = () => {
     let isValid = true;
-    if (validateField('email', email)) isValid = false; // Valida o campo 'email'
-
-    // Força atualização visual dos erros (garante que todos os erros sejam exibidos)
+    if (validateField('email', email)) isValid = false; 
     setValidationErrors((prev) => ({ ...prev, email: validationErrors.email || '' }));
     
     if (!isValid) {
@@ -60,13 +58,13 @@ const RecoverPasswordPage: React.FC = () => {
         return;
     }
 
-    setLoading(true); // Inicia o carregamento
+    setLoading(true); 
     try {
-      // Nota: Esta rota é apenas simulada. A recuperação real exigiria um backend para enviar e-mail.
-      const response = await api.post('/auth/recover-password', { email }); // Usa 'email' no payload
+      
+      const response = await api.post('/auth/recover-password', { email }); 
       setMessage(response.data.message);
-      setEmail(''); // Limpa o campo após o envio
-      setTimeout(() => navigate('/login'), 3000); // Redireciona para o login após 3 segundos
+      setEmail(''); 
+      setTimeout(() => navigate('/login'), 3000); 
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
@@ -76,7 +74,7 @@ const RecoverPasswordPage: React.FC = () => {
         setError('Ocorreu um erro desconhecido ao solicitar recuperação de senha.');
       }
     } finally {
-      setLoading(false); // Finaliza o carregamento
+      setLoading(false); 
     }
   };
 
@@ -86,20 +84,19 @@ const RecoverPasswordPage: React.FC = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      // REMOVIDO: minHeight: '100vh',
-      // REMOVIDO: background: 'linear-gradient(to bottom right, #f0f4f8, #e0e7ed)',
+      
     }}>
       <div style={{
-        padding: '50px', // O padding foi alterado para 30px no meu último código, mas no seu está 50px. Mantenho o que está no seu, que é 50px.
-        maxWidth: '450px', // Ajustado para corresponder ao padrão
+        padding: '50px', 
+        maxWidth: '450px', 
         width: '100%',
         backgroundColor: '#fff',
-        borderRadius: '12px', // Bordas arredondadas
-        boxShadow: '0 8px 25px rgba(0,0,0,0.15)', // Sombra
-        position: 'relative', // Para posicionar o botão de voltar
+        borderRadius: '12px', 
+        boxShadow: '0 8px 25px rgba(0,0,0,0.15)', 
+        position: 'relative', 
         textAlign: 'center'
       }}>
-        {/* Botão de Voltar */}
+
         <button
           onClick={() => navigate(-1)}
           style={{
@@ -139,28 +136,28 @@ const RecoverPasswordPage: React.FC = () => {
         <h2 style={{ color: '#2c3e50', fontSize: '2.5rem', fontWeight: '700', marginBottom: '20px' }}>Recuperar Senha</h2>
         <p style={{ color: '#607d8b', fontSize: '0.95rem', marginBottom: '30px' }}>
           Informe seu e-mail para iniciar o processo de recuperação de senha.
-          {/* Removido "(simulando e-mail)" se a intenção é que seja real ou menos confuso */}
+          
         </p>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px', position: 'relative' }}>
-            <label htmlFor="recoverEmail" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>E-mail Cadastrado:</label> {/* Mudado para 'E-mail Cadastrado' */}
+            <label htmlFor="recoverEmail" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>E-mail Cadastrado:</label> 
             <div style={{ position: 'relative' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}>
                     <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
                 <input
-                    type="email" // Alterado para type="email" para validação nativa do navegador
+                    type="email" 
                     id="recoverEmail"
-                    name="email" // Alterado name para 'email'
+                    name="email" 
                     value={email}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     required
-                    placeholder="seu.email@exemplo.com" // Ajustado placeholder
+                    placeholder="seu.email@exemplo.com" 
                     style={{
                         width: '100%',
                         padding: '12px 12px 12px 45px',
-                        border: `1px solid ${validationErrors.email ? '#dc3545' : '#ddd'}`, // Borda vermelha se erro
+                        border: `1px solid ${validationErrors.email ? '#dc3545' : '#ddd'}`, 
                         borderRadius: '8px',
                         fontSize: '1rem',
                         boxSizing: 'border-box'

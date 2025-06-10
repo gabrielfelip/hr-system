@@ -36,7 +36,6 @@ const Header: React.FC = () => {
 
       
 
-      {/* Espaçador à direita para balancear o botão voltar */}
       <div style={{ flexShrink: 0, width: '40px' }}>
         {     }
       </div>

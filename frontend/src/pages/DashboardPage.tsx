@@ -119,7 +119,6 @@ const DashboardPage: React.FC = () => {
           marginBottom: '40px'
         }}>
 
-          {/* Card Total de Funcionários */}
           <div style={{
             backgroundColor: '#f0f8ff',
             padding: '15px',
@@ -135,7 +134,6 @@ const DashboardPage: React.FC = () => {
             <p style={{ color: '#1E40AF', fontSize: '1.8rem', fontWeight: 'bold' }}>{totalEmployees}</p>
           </div>
 
-          {/* Card Novas Contratações (Mês) - Não Clicável Agora */}
           <div
             style={{
               backgroundColor: '#e0fff2',
@@ -154,7 +152,6 @@ const DashboardPage: React.FC = () => {
             <p style={{ color: '#059669', fontSize: '1.8rem', fontWeight: 'bold' }}>{newHiresThisMonth}</p>
           </div>
 
-          {/* Card Próximas Férias - Não Clicável Agora */}
           <div
             style={{
               backgroundColor: '#fffaf0',
@@ -177,9 +174,7 @@ const DashboardPage: React.FC = () => {
         <nav>
           <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
 
-            {/* --- ORGANIZAÇÃO DOS CARDS DE AÇÃO --- */}
 
-            {/* CARD 'GERENCIAR FUNCIONÁRIOS' (Mantido para todos) */}
             <li style={{ minHeight: '150px' }}>
               <Link
                 to="/employees"
@@ -216,7 +211,6 @@ const DashboardPage: React.FC = () => {
               </Link>
             </li>
 
-            {/* CARD 'ADICIONAR FUNCIONÁRIO' (Apenas para administradores) */}
             {isAdmin && (
               <li style={{ minHeight: '150px' }}>
                 <Link
@@ -255,7 +249,6 @@ const DashboardPage: React.FC = () => {
               </li>
             )}
 
-            {/* CARD 'ALTERAR SENHA' */}
             <li style={{ minHeight: '150px' }}>
               <Link
                 to="/change-password"
@@ -292,7 +285,6 @@ const DashboardPage: React.FC = () => {
               </Link>
             </li>
 
-            {/* CARD 'SAIR' */}
             <li style={{ minHeight: '150px' }}>
               <button
                 onClick={handleLogout}

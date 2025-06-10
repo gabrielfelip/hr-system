@@ -2,17 +2,16 @@ import express from 'express';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import employeeRoutes from './routes/employeeRoutes';
-import cors from 'cors'; // Importa o CORS
+import cors from 'cors'; 
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json()); // Habilita o parsing de JSON no corpo das requisições
-app.use(cors()); // Habilita CORS para permitir requisições do frontend
+app.use(express.json()); 
+app.use(cors());
 
-// Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 

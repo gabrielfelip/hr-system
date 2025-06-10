@@ -7,28 +7,22 @@ import EmployeeListPage from './pages/EmployeeListPage';
 import RegisterPage from './pages/RegisterPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RecoverPasswordPage from './pages/RecoverPasswordPage';
-// import Header from './components/Header'; // Não precisamos mais importar Header aqui
-import MainLayout from './layouts/MainLayout'; // Importe o novo MainLayout
+import MainLayout from './layouts/MainLayout';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
-  // PrivateRoute agora apenas lida com a lógica de autenticação.
-  // O MainLayout que será o wrapper principal.
   return token ? <>{children}</> : <Navigate to="/login" />;
 };
 
 function App() {
   return (
     <Router>
-      {/* MainLayout envolve TODAS as rotas para garantir o Header */}
       <MainLayout>
         <Routes>
-          {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/recover-password" element={<RecoverPasswordPage />} />
 
-          {/* Rotas Privadas (necessitam de autenticação) */}
           <Route path="/dashboard" element={
             <PrivateRoute>
               <DashboardPage />
@@ -59,7 +53,6 @@ function App() {
             </PrivateRoute>
           } />
 
-          {/* Redirecionamento padrão para /login se nenhuma rota for encontrada */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </MainLayout>

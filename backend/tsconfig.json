@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "sourceMap": true
   },
-  "include": ["src/**/*.ts", "prisma/seed.ts"], // Incluir o seed para compilação
+  "include": ["src/**/*.ts", "prisma/seed.ts"], 
   "exclude": ["node_modules"]
 }

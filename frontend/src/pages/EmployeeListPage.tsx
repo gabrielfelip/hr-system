@@ -8,7 +8,7 @@ interface Employee {
   sobrenome: string;
   email: string;
   telefone?: string;
-  dataContratacao: string; // Vem como string 'YYYY-MM-DD' do backend
+  dataContratacao: string;
   cargo: string;
   departamento: string;
   salario: number | string;
@@ -25,11 +25,9 @@ const EmployeeListPage: React.FC = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  // --- Estados para Filtros e Ordenação ---
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
   const [currentSort, setCurrentSort] = useState<{ field: string; order: 'asc' | 'desc' }>({ field: 'nome', order: 'asc' });
-  // --- Fim dos Estados para Filtros e Ordenação ---
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isAdmin = user.tipo === '0';
@@ -136,24 +134,15 @@ const EmployeeListPage: React.FC = () => {
     });
   }, [employees, searchTerm, filterDepartment, currentSort]);
 
-  // Define a estrutura de colunas para o grid (cabeçalho e linhas)
-  // Ajustes finos nas larguras:
-  // 1. Avatar (fixo)
-  // 2. Nome Completo + Cargo (fr, para preencher espaço)
-  // 3. Email (fr, para preencher espaço)
-  // 4. Departamento (fr, para preencher espaço)
-  // 5. Salário (fixo, para moeda)
-  // 6. Ações (fixo, para botões verticais - agora precisa de menos largura, mas mais altura se a linha for simples)
   const gridColumnTemplate = isAdmin
-    ? '60px 2.5fr 2fr 1.5fr 120px 100px' // Removida coluna de cargo, Ações em 100px para empilhar
-    : '60px 2.5fr 2fr 1.5fr 120px'; // Sem a coluna de Ações para não-admin
+    ? '60px 2.5fr 2fr 1.5fr 120px 100px'
+    : '60px 2.5fr 2fr 1.5fr 120px';
 
   return (
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      
     }}>
       <div style={{
         padding: '30px',
@@ -206,7 +195,6 @@ const EmployeeListPage: React.FC = () => {
         {error && <p style={{ color: '#dc3545', marginBottom: '15px', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>}
         {message && <p style={{ color: '#28a745', marginBottom: '15px', textAlign: 'center', fontWeight: 'bold' }}>{message}</p>}
 
-        {/* --- INÍCIO DA ÁREA DE FILTROS --- */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -238,14 +226,13 @@ const EmployeeListPage: React.FC = () => {
               style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px', boxSizing: 'border-box' }}
             />
           </label>
-          {/* Botão de Limpar Filtros */}
           {(searchTerm || filterDepartment || currentSort.field !== 'nome' || currentSort.order !== 'asc') && ( 
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               <button
                 onClick={() => {
                   setSearchTerm('');
                   setFilterDepartment('');
-                  setCurrentSort({ field: 'nome', order: 'asc' }); // Reseta para ordenação padrão
+                  setCurrentSort({ field: 'nome', order: 'asc' });
                   navigate(location.pathname, { replace: true, state: {} }); 
                 }}
                 style={{
@@ -268,7 +255,6 @@ const EmployeeListPage: React.FC = () => {
             </div>
           )}
         </div>
-        {/* --- FIM DA ÁREA DE FILTROS --- */}
 
         {filteredAndSortedEmployees.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#777', padding: '20px', border: '1px dashed #ccc', borderRadius: '8px' }}>
@@ -284,10 +270,9 @@ const EmployeeListPage: React.FC = () => {
             overflow: 'hidden',
             boxShadow: '0 4px 15px rgba(0,0,0,0.08)'
           }}>
-            {/* Cabeçalho das Colunas Clicáveis */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: gridColumnTemplate, // Usando a variável de template
+              gridTemplateColumns: gridColumnTemplate,
               backgroundColor: '#2c3e50',
               color: 'white',
               fontSize: '0.9rem',
@@ -295,10 +280,10 @@ const EmployeeListPage: React.FC = () => {
               padding: '15px 20px',
               borderBottom: '1px solid #4a6a8b',
               borderRadius: '10px 10px 0 0',
-              gap: '10px', // Espaçamento entre colunas do cabeçalho
-              alignItems: 'center', // Alinhar verticalmente itens do cabeçalho
+              gap: '10px',
+              alignItems: 'center',
             }}>
-              <div style={{ textAlign: 'center' }}></div> {/* Coluna para o Avatar */}
+              <div style={{ textAlign: 'center' }}></div>
               <div style={{ textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => handleSortClick('nome')}>
                 Nome Completo
                 {currentSort.field === 'nome' && (
@@ -331,26 +316,24 @@ const EmployeeListPage: React.FC = () => {
                   </svg>
                 )}
               </div>
-              {isAdmin && <div style={{ textAlign: 'center', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Ações</div>} {/* Garantir que 'Ações' centraliza */}
+              {isAdmin && <div style={{ textAlign: 'center', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Ações</div>}
             </div>
 
-            {/* Lista de Funcionários (linhas como cards compactos) */}
             {filteredAndSortedEmployees.map((employee, index) => (
               <div
                 key={employee.id}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: gridColumnTemplate, // Usando a variável de template
-                  padding: '12px 20px', // Reduzido um pouco o padding para compactar e dar mais espaço
+                  gridTemplateColumns: gridColumnTemplate,
+                  padding: '12px 20px',
                   backgroundColor: index % 2 === 0 ? '#fdfdfd' : '#f8f8f8',
                   borderBottom: '1px solid #eee',
-                  alignItems: 'center', // Alinhar verticalmente o conteúdo de cada célula
-                  transition: 'background-color 0.2s ease',
-                  gap: '20px', // Espaçamento entre colunas da linha
-                  minHeight: '80px', // Garantir altura mínima para a linha, para acomodar botões verticais
+                  alignItems: 'center',
+                  transition: 'background-color 0.2s ease',                 
+                  gap: '20px',
+                  minHeight: '80px',
                 }}
               >
-                {/* Avatar/Ícone de Usuário */}
                 <div style={{ textAlign: 'center' }}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -364,31 +347,27 @@ const EmployeeListPage: React.FC = () => {
                   </svg>
                 </div>
 
-                {/* Informações do Funcionário - Nome Completo e Cargo Principal */}
                 <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', minWidth: '0' }}>
                   <span style={{ fontWeight: '600', color: '#2c3e50', fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{employee.nome} {employee.sobrenome}</span>
                   <span style={{ color: '#007bff', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{employee.cargo}</span>
                 </div>
-                {/* Email */}
                 <div style={{ textAlign: 'left', color: '#666', fontSize: '0.9rem', minWidth: '0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{employee.email}</div>
-                {/* Departamento */}
                 <div style={{ textAlign: 'left', paddingLeft: '35px', color: '#666', fontSize: '0.9rem', minWidth: '0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{employee.departamento}</div>
-                {/* Salário */}
                 <div style={{ color: '#059669', paddingRight: '40px', fontSize: '0.95rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>R$ {parseFloat(String(employee.salario)).toFixed(2)}</div>
 
                 {isAdmin && (
                   <div style={{ 
                     display: 'flex', 
-                    flexDirection: 'column', // Botões um abaixo do outro
-                    gap: '5px', // Espaçamento entre os botões
+                    flexDirection: 'column',
+                    gap: '5px',
                     justifyContent: 'center', 
                     alignItems: 'center', 
-                    minHeight: '100%', // Garantir que o container ocupe a altura da célula
+                    minHeight: '100%',
                   }}>
                     <button
                       onClick={() => handleEditClick(employee)}
                       style={{
-                        padding: '6px 10px', // Ajustado padding para caber verticalmente
+                        padding: '6px 10px',
                         backgroundColor: '#FFD700',
                         color: '#333',
                         border: 'none',
@@ -399,8 +378,8 @@ const EmployeeListPage: React.FC = () => {
                         transition: 'background-color 0.3s ease',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         display: 'inline-flex', alignItems: 'center', gap: '4px',
-                        width: '100%', // Botão ocupa a largura total da célula de ação
-                        justifyContent: 'center' // Centraliza o conteúdo do botão
+                        width: '100%',
+                        justifyContent: 'center'
                       }}
                       onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E0B600'}
                       onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#FFD700'}
@@ -411,7 +390,7 @@ const EmployeeListPage: React.FC = () => {
                     <button
                       onClick={() => handleDeleteEmployee(employee.id)}
                       style={{
-                        padding: '6px 10px', // Ajustado padding
+                        padding: '6px 10px',
                         backgroundColor: '#DC3545',
                         color: 'white',
                         border: 'none',
@@ -422,8 +401,8 @@ const EmployeeListPage: React.FC = () => {
                         transition: 'background-color 0.3s ease',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         display: 'inline-flex', alignItems: 'center', gap: '4px',
-                        width: '100%', // Botão ocupa a largura total da célula de ação
-                        justifyContent: 'center' // Centraliza o conteúdo do botão
+                        width: '100%',
+                        justifyContent: 'center'
                       }}
                       onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#C82333'}
                       onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#DC3545'}

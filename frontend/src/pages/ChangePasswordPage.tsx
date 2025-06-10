@@ -8,15 +8,13 @@ const ChangePasswordPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   
-  const [error, setError] = useState(''); // Erro geral de submissão
-  const [message, setMessage] = useState(''); // Mensagem de sucesso
-  const [loading, setLoading] = useState(false); // Estado de carregamento
+  const [error, setError] = useState(''); 
+  const [message, setMessage] = useState(''); 
+  const [loading, setLoading] = useState(false); 
 
-  // Estados para validação de campos individuais
   const [newPasswordError, setNewPasswordError] = useState<string | null>(null);
   const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   
-  // Novo estado para os requisitos da senha
   const [passwordRequirements, setPasswordRequirements] = useState({
     minChars: false,
     hasUpper: false,
@@ -26,7 +24,6 @@ const ChangePasswordPage: React.FC = () => {
     notCurrent: false, 
   });
 
-  // Função para avaliar os requisitos da senha
   const checkPasswordRequirements = (password: string, oldPassword: string) => {
     const reqs = {
       minChars: password.length >= 8,
@@ -34,20 +31,18 @@ const ChangePasswordPage: React.FC = () => {
       hasLower: /[a-z]/.test(password),
       hasNumber: /\d/.test(password),
       hasSpecial: /[^A-Za-z0-9]/.test(password),
-      // A nova senha não deve ser igual à atual, e não pode ser vazia
+
       notCurrent: password.length > 0 && password !== oldPassword, 
     };
     setPasswordRequirements(reqs);
 
-    // Ajusta newPasswordError para requisitos não cumpridos ou outros erros
     if (password.length > 0 && !reqs.minChars) {
         setNewPasswordError('A senha deve ter pelo menos 8 caracteres.');
     } else if (password.length > 0 && !reqs.hasUpper && !reqs.hasLower && !reqs.hasNumber && !reqs.hasSpecial) {
         setNewPasswordError('A senha precisa de mais complexidade.');
     } else {
-        setNewPasswordError(null); // Limpa erro específico de nova senha se os requisitos básicos de formato estiverem OK
+        setNewPasswordError(null); 
     }
-    // O erro de "não pode ser igual à senha atual" será validado no `validateForm` também.
   };
 
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +71,6 @@ const ChangePasswordPage: React.FC = () => {
   const handleCurrentPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCurrentPassword(value);
-    // Recalcula requisitos da nova senha pois a senha atual pode ter mudado
     checkPasswordRequirements(newPassword, value); 
     setError('');
   };
@@ -94,7 +88,6 @@ const ChangePasswordPage: React.FC = () => {
         isValid = false;
     }
 
-    // Re-avalia requisitos da nova senha para a validação final
     checkPasswordRequirements(newPassword, currentPassword);
     
     const allRequirementsMet = 
@@ -105,7 +98,7 @@ const ChangePasswordPage: React.FC = () => {
         passwordRequirements.hasSpecial &&
         passwordRequirements.notCurrent; 
 
-    if (!newPassword.trim()) { // Verifica se a nova senha está vazia ou só com espaços
+    if (!newPassword.trim()) { 
         setNewPasswordError('A nova senha é obrigatória.');
         isValid = false;
     } else if (!allRequirementsMet) {
@@ -146,7 +139,7 @@ const ChangePasswordPage: React.FC = () => {
       setConfirmNewPassword('');
       setNewPasswordError(null);
       setConfirmPasswordError(null);
-      setPasswordRequirements({ // Reseta os requisitos para o estado inicial (false)
+      setPasswordRequirements({ 
         minChars: false, hasUpper: false, hasLower: false, hasNumber: false, hasSpecial: false, notCurrent: false
       });
 
@@ -164,14 +157,13 @@ const ChangePasswordPage: React.FC = () => {
     }
   };
 
-  // Componente auxiliar para exibir um requisito de senha
   const RequirementItem: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
     <li style={{ display: 'flex', alignItems: 'center', color: met ? '#28a745' : '#6c757d', marginBottom: '5px' }}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
         {met ? (
-          <polyline points="20 6 9 17 4 12" /> // Checkmark
+          <polyline points="20 6 9 17 4 12" /> 
         ) : (
-          <circle cx="12" cy="12" r="10" /> // Círculo vazio
+          <circle cx="12" cy="12" r="10" /> 
         )}
       </svg>
       {text}
@@ -262,7 +254,7 @@ const ChangePasswordPage: React.FC = () => {
               style={{ 
                 width: '100%', 
                 padding: '10px', 
-                border: `1px solid ${error.includes('senha atual') ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                border: `1px solid ${error.includes('senha atual') ? '#dc3545' : '#ccc'}`, 
                 borderRadius: '5px', 
                 marginTop: '5px' 
               }}
@@ -277,20 +269,20 @@ const ChangePasswordPage: React.FC = () => {
               id="newPassword"
               value={newPassword}
               onChange={handleNewPasswordChange}
-              onBlur={() => checkPasswordRequirements(newPassword, currentPassword)} // Avalia requisitos ao sair
+              onBlur={() => checkPasswordRequirements(newPassword, currentPassword)} 
               required
               placeholder="Crie sua nova senha"
               style={{ 
                 width: '100%', 
                 padding: '10px', 
-                border: `1px solid ${newPasswordError ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                border: `1px solid ${newPasswordError ? '#dc3545' : '#ccc'}`, 
                 borderRadius: '5px', 
                 marginTop: '5px' 
               }}
             />
             {newPasswordError && <p style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '5px' }}>{newPasswordError}</p>}
             
-            {/* Lista de Requisitos da Senha - SEMPRE VISÍVEL */}
+            
             <ul style={{ listStyle: 'none', padding: '10px 0 0 0', margin: '0', fontSize: '0.9rem' }}>
                 <RequirementItem met={passwordRequirements.minChars} text="Pelo menos 8 caracteres" />
                 <RequirementItem met={passwordRequirements.hasUpper} text="Pelo menos 1 letra maiúscula" />
@@ -308,7 +300,7 @@ const ChangePasswordPage: React.FC = () => {
               id="confirmNewPassword"
               value={confirmNewPassword}
               onChange={handleConfirmNewPasswordChange}
-              onBlur={() => { // Valida ao sair
+              onBlur={() => { 
                 if (newPassword !== confirmNewPassword) {
                   setConfirmPasswordError('As senhas não coincidem.');
                 } else {
@@ -320,7 +312,7 @@ const ChangePasswordPage: React.FC = () => {
               style={{ 
                 width: '100%', 
                 padding: '10px', 
-                border: `1px solid ${confirmPasswordError ? '#dc3545' : '#ccc'}`, // Borda vermelha se erro
+                border: `1px solid ${confirmPasswordError ? '#dc3545' : '#ccc'}`, 
                 borderRadius: '5px', 
                 marginTop: '5px' 
               }}
@@ -330,15 +322,15 @@ const ChangePasswordPage: React.FC = () => {
 
           <button
             type="submit"
-            disabled={loading} // Desabilita o botão durante o carregamento
+            disabled={loading} 
             style={{
               width: '100%',
               padding: '15px 20px', 
-              backgroundColor: loading ? '#6c757d' : '#059669', // Mudar cor durante o carregamento
+              backgroundColor: loading ? '#6c757d' : '#059669', 
               color: 'white',
               border: 'none',
               borderRadius: '8px', 
-              cursor: loading ? 'not-allowed' : 'pointer', // Mudar cursor durante o carregamento
+              cursor: loading ? 'not-allowed' : 'pointer', 
               fontSize: '1.1rem', 
               fontWeight: 'bold',
               transition: 'background-color 0.3s ease, transform 0.2s ease',
@@ -351,7 +343,7 @@ const ChangePasswordPage: React.FC = () => {
             onMouseOver={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#047857'; e.currentTarget.style.transform = 'translateY(-3px)'; }}}
             onMouseOut={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.transform = 'translateY(0)'; }}}
           >
-            {loading ? 'Alterando...' : 'Alterar Senha'} {/* Texto do botão durante o carregamento */}
+            {loading ? 'Alterando...' : 'Alterar Senha'} 
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </button>
         </form>

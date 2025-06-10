@@ -6,7 +6,7 @@ const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Novo estado para mostrar/ocultar senha
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,24 +34,24 @@ const LoginPage: React.FC = () => {
 
   return (
     <div style={{
-      display: 'flex', // Adicionado para centralizar verticalmente no meio da tela
-      justifyContent: 'center', // Centralizar horizontalmente
-      alignItems: 'center', // Centralizar verticalmente
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
     }}>
       <div style={{
-        padding: '50px', // Aumentado padding para melhor espaçamento
-        maxWidth: '450px', // Aumentado largura para melhor visualização
+        padding: '50px', 
+        maxWidth: '450px', 
         width: '100%',
         backgroundColor: '#fff',
-        borderRadius: '12px', // Bordas mais arredondadas
-        boxShadow: '0 8px 25px rgba(0,0,0,0.15)', // Sombra mais proeminente
+        borderRadius: '12px', 
+        boxShadow: '0 8px 25px rgba(0,0,0,0.15)', 
         textAlign: 'center'
       }}>
-        <h2 style={{ color: '#2c3e50', fontSize: '2.5rem', fontWeight: '700', marginBottom: '30px' }}>Login</h2> {/* Estilo do título aprimorado */}
+        <h2 style={{ color: '#2c3e50', fontSize: '2.5rem', fontWeight: '700', marginBottom: '30px' }}>Login</h2> 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px', position: 'relative' }}> {/* Adicionado position: relative para o ícone */}
+          <div style={{ marginBottom: '15px', position: 'relative' }}> 
             <label htmlFor="username" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>Usuário:</label>
-            <div style={{ position: 'relative' }}> {/* Div para conter o input e o ícone */}
+            <div style={{ position: 'relative' }}> 
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}>
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
@@ -64,40 +64,40 @@ const LoginPage: React.FC = () => {
                 required
                 placeholder="Digite seu nome de usuário"
                 style={{
-                  width: '100%', // Alterado para 100%
-                  padding: '12px 12px 12px 45px', // Ajustado padding-left para o ícone
+                  width: '100%', 
+                  padding: '12px 12px 12px 45px', 
                   border: '1px solid #ddd',
-                  borderRadius: '8px', // Bordas mais arredondadas para inputs
+                  borderRadius: '8px', 
                   fontSize: '1rem',
-                  boxSizing: 'border-box' // Garante que padding e border não aumentem a largura total
+                  boxSizing: 'border-box' 
                 }}
               />
             </div>
           </div>
-          <div style={{ marginBottom: '20px', position: 'relative' }}> {/* Adicionado position: relative para o ícone e olho */}
+          <div style={{ marginBottom: '20px', position: 'relative' }}> 
             <label htmlFor="password" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>Senha:</label>
-            <div style={{ position: 'relative' }}> {/* Div para conter o input e o ícone */}
+            <div style={{ position: 'relative' }}> 
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}>
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
               <input
-                type={showPassword ? 'text' : 'password'} // Alterna o tipo do input
+                type={showPassword ? 'text' : 'password'} 
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Digite sua senha"
                 style={{
-                  width: '100%', // Alterado para 100%
-                  padding: '12px 45px 12px 45px', // Ajustado padding-left para o ícone, padding-right para o olho
+                  width: '100%', 
+                  padding: '12px 45px 12px 45px', 
                   border: '1px solid #ddd',
-                  borderRadius: '8px', // Bordas mais arredondadas para inputs
+                  borderRadius: '8px', 
                   fontSize: '1rem',
                   boxSizing: 'border-box'
                 }}
               />
-              {/* Ícone de olho para mostrar/ocultar senha */}
+
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
@@ -129,21 +129,21 @@ const LoginPage: React.FC = () => {
               </button>
             </div>
           </div>
-          {error && <p style={{ color: '#dc3545', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem' }}>{error}</p>} {/* Estilo da mensagem de erro */}
+          {error && <p style={{ color: '#dc3545', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem' }}>{error}</p>} 
           <button
             type="submit"
             style={{
               width: '100%',
-              padding: '14px', // Aumentado padding do botão
+              padding: '14px', 
               backgroundColor: '#007bff',
               color: 'white',
               border: 'none',
-              borderRadius: '8px', // Bordas mais arredondadas para botão
+              borderRadius: '8px', 
               cursor: 'pointer',
-              fontSize: '1.1rem', // Aumentado fonte
+              fontSize: '1.1rem', 
               fontWeight: 'bold',
-              transition: 'background-color 0.3s ease, transform 0.2s ease', // Adicionado transform
-              boxShadow: '0 4px 10px rgba(0,0,0,0.1)' // Adicionado sombra
+              transition: 'background-color 0.3s ease, transform 0.2s ease', 
+              boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
             }}
             onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#0056b3'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#007bff'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -151,10 +151,10 @@ const LoginPage: React.FC = () => {
             Entrar
           </button>
         </form>
-        <p style={{ marginTop: '25px', textAlign: 'center', fontSize: '0.95rem' }}> {/* Ajustado font size */}
+        <p style={{ marginTop: '25px', textAlign: 'center', fontSize: '0.95rem' }}> 
           Não tem uma conta? <Link to="/register" style={{ color: '#007bff', textDecoration: 'none', fontWeight: 'bold' }}>Cadastre-se</Link>
         </p>
-        <p style={{ textAlign: 'center', fontSize: '0.95rem' }}> {/* Ajustado font size */}
+        <p style={{ textAlign: 'center', fontSize: '0.95rem' }}> 
           Esqueceu a senha? <Link to="/recover-password" style={{ color: '#007bff', textDecoration: 'none', fontWeight: 'bold' }}>Recuperar Senha</Link>
         </p>
       </div>

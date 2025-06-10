@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 
-// Extender o Request para incluir o usuário decodificado
 declare global {
   namespace Express {
     interface Request {
@@ -12,10 +11,9 @@ declare global {
     }
   }
 }
-
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(' ')[1]; 
 
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido' });
@@ -27,7 +25,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     return res.status(403).json({ message: 'Token inválido ou expirado' });
   }
 
-  req.user = decoded; // Armazena o payload do token na requisição
+  req.user = decoded; 
   next();
 };
 

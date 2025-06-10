@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
-
-// Interface para os erros de validação por campo
 interface ValidationErrors {
   username?: string;
   nome?: string;
@@ -15,16 +13,15 @@ const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
-  const [tipo, setTipo] = useState<'0' | '1'>('1'); // Padrão "Usuário Comum"
+  const [tipo, setTipo] = useState<'0' | '1'>('1'); 
 
-  const [error, setError] = useState(''); // Erro geral de submissão
-  const [message, setMessage] = useState(''); // Mensagem de sucesso
-  const [loading, setLoading] = useState(false); // Estado de carregamento
+  const [error, setError] = useState(''); 
+  const [message, setMessage] = useState(''); 
+  const [loading, setLoading] = useState(false); 
 
-  const [showPassword, setShowPassword] = useState(false); // Novo estado para mostrar/ocultar senha
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({}); // Erros de validação por campo
+  const [showPassword, setShowPassword] = useState(false); 
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({}); 
   
-  // Novo estado para os requisitos da senha
   const [passwordRequirements, setPasswordRequirements] = useState({
     minChars: false,
     hasUpper: false,
@@ -33,7 +30,6 @@ const RegisterPage: React.FC = () => {
     hasSpecial: false,
   });
 
-  // Função para avaliar os requisitos da senha
   const checkPasswordRequirements = (pwd: string) => {
     const reqs = {
       minChars: pwd.length >= 8,
@@ -44,16 +40,13 @@ const RegisterPage: React.FC = () => {
     };
     setPasswordRequirements(reqs);
 
-    // Retorna true se todos os requisitos básicos de formato foram atendidos
     return Object.values(reqs).every(Boolean);
   };
 
-  // Função para alternar visibilidade da senha
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // Função de validação de campo individual
   const validateField = (name: keyof ValidationErrors, value: string) => {
     let errorMessage = '';
     switch (name) {
@@ -64,42 +57,37 @@ const RegisterPage: React.FC = () => {
         if (!value.trim()) errorMessage = 'Nome completo é obrigatório.';
         break;
       case 'password':
-        // A validação completa é feita por checkPasswordRequirements, aqui só erro básico de vazio
         if (!value.trim()) errorMessage = 'Senha é obrigatória.';
         break;
       default:
         break;
     }
     setValidationErrors((prev) => ({ ...prev, [name]: errorMessage }));
-    return errorMessage; // Retorna o erro para validação geral
+    return errorMessage; 
   };
 
-  // Handler de mudança para inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setError(''); // Limpa erro geral ao digitar
+    setError(''); 
 
     if (name === 'username') setUsername(value);
     else if (name === 'nome') setNome(value);
     else if (name === 'password') {
       setPassword(value);
-      checkPasswordRequirements(value); // Valida requisitos da senha ao digitar
+      checkPasswordRequirements(value); 
     }
     else if (name === 'tipo') setTipo(value as '0' | '1');
 
-    // Validação individual ao digitar para campos de texto/select
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
         validateField(name as keyof ValidationErrors, value);
     }
   };
 
-  // Handler de saída do campo para inputs de texto (foco perdido)
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     validateField(name as keyof ValidationErrors, value);
   };
 
-  // Validação completa do formulário antes do submit
   const validateForm = () => {
     let isValid = true;
     const newErrors: ValidationErrors = {};
@@ -107,9 +95,8 @@ const RegisterPage: React.FC = () => {
     // Validações individuais
     if (validateField('username', username)) isValid = false;
     if (validateField('nome', nome)) isValid = false;
-    if (validateField('password', password)) isValid = false; // Basicamente verifica se não está vazio
+    if (validateField('password', password)) isValid = false; 
 
-    // Validação de requisitos de senha (mais detalhada)
     const allPasswordReqsMet = checkPasswordRequirements(password);
     if (!allPasswordReqsMet) {
       newErrors.password = 'A senha não atende a todos os requisitos.';
@@ -129,15 +116,14 @@ const RegisterPage: React.FC = () => {
     setError('');
     setMessage('');
 
-    if (!validateForm()) { // Executa a validação completa do formulário
-      return; // Impede o envio se houver erros de validação
+    if (!validateForm()) { 
+      return; 
     }
 
-    setLoading(true); // Inicia o carregamento
+    setLoading(true); 
     try {
       const response = await api.post('/auth/register', { username, password, nome, tipo });
       setMessage(response.data.message);
-      // Limpa o formulário após o sucesso
       setUsername('');
       setPassword('');
       setNome('');
@@ -145,7 +131,7 @@ const RegisterPage: React.FC = () => {
       setValidationErrors({});
       setPasswordRequirements({ minChars: false, hasUpper: false, hasLower: false, hasNumber: false, hasSpecial: false });
 
-      setTimeout(() => navigate('/login'), 2000); // Redireciona para o login após 2 segundos
+      setTimeout(() => navigate('/login'), 2000); 
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err && (err as { response: { data?: { message?: string } } }).response?.data?.message) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
@@ -155,18 +141,17 @@ const RegisterPage: React.FC = () => {
         setError('Ocorreu um erro desconhecido ao registrar usuário.');
       }
     } finally {
-      setLoading(false); // Finaliza o carregamento
+      setLoading(false); 
     }
   };
 
-  // Componente auxiliar para exibir um requisito de senha
   const RequirementItem: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
     <li style={{ display: 'flex', alignItems: 'center', color: met ? '#28a745' : '#6c757d', marginBottom: '5px' }}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
         {met ? (
-          <polyline points="20 6 9 17 4 12" /> // Checkmark
+          <polyline points="20 6 9 17 4 12" /> 
         ) : (
-          <circle cx="12" cy="12" r="10" /> // Círculo vazio
+          <circle cx="12" cy="12" r="10" /> 
         )}
       </svg>
       {text}
@@ -180,8 +165,7 @@ const RegisterPage: React.FC = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      // REMOVIDO: minHeight: '100vh', 
-      // REMOVIDO: background: 'linear-gradient(to bottom right, #f0f4f8, #e0e7ed)', 
+      
     }}>
       <div style={{
         padding: '50px', 
@@ -193,7 +177,7 @@ const RegisterPage: React.FC = () => {
         position: 'relative', 
         textAlign: 'center'
       }}>
-        {/* Botão de Voltar */}
+
         <button
           onClick={() => navigate(-1)} 
           style={{
@@ -232,7 +216,7 @@ const RegisterPage: React.FC = () => {
 
         <h2 style={{ color: '#2c3e50', fontSize: '2.5rem', fontWeight: '700', marginBottom: '30px' }}>Cadastro de Usuário</h2>
         <form onSubmit={handleSubmit}>
-          {/* Usuário (Login) */}
+
           <div style={{ marginBottom: '15px', position: 'relative' }}>
             <label htmlFor="regUsername" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>Usuário (Login):</label>
             <div style={{ position: 'relative' }}>
@@ -261,7 +245,7 @@ const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Nome Completo */}
+
           <div style={{ marginBottom: '15px', position: 'relative' }}>
             <label htmlFor="regNome" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', textAlign: 'left', color: '#555' }}>Nome Completo:</label>
             <div style={{ position: 'relative' }}>
@@ -289,7 +273,7 @@ const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Senha */}
+
           <div style={{ marginBottom: '15px', textAlign: 'left', position: 'relative' }}>
             <label htmlFor="regPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#555' }}>Senha:</label>
             <div style={{ position: 'relative' }}>
@@ -346,7 +330,7 @@ const RegisterPage: React.FC = () => {
             </div>
             {validationErrors.password && <p style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: '5px' }}>{validationErrors.password}</p>}
             
-            {/* Lista de Requisitos da Senha */}
+
             <ul style={{ listStyle: 'none', padding: '10px 0 0 0', margin: '0', fontSize: '0.9rem' }}>
                 <RequirementItem met={passwordRequirements.minChars} text="Pelo menos 8 caracteres" />
                 <RequirementItem met={passwordRequirements.hasUpper} text="Pelo menos 1 letra maiúscula" />
@@ -356,7 +340,7 @@ const RegisterPage: React.FC = () => {
             </ul>
           </div>
 
-          {/* Tipo de Usuário */}
+
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
             <label htmlFor="regTipo" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#555' }}>Tipo de Usuário:</label>
             <select
@@ -369,7 +353,7 @@ const RegisterPage: React.FC = () => {
                 width: '100%',
                 padding: '10px',
                 border: '1px solid #ddd',
-                borderRadius: '8px', // Bordas arredondadas
+                borderRadius: '8px', 
                 fontSize: '1rem',
                 boxSizing: 'border-box'
               }}
@@ -383,19 +367,19 @@ const RegisterPage: React.FC = () => {
           {message && <p style={{ color: '#28a745', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem' }}>{message}</p>}
           <button
             type="submit"
-            disabled={loading} // Desabilita o botão durante o carregamento
+            disabled={loading} 
             style={{
               width: '100%',
-              padding: '14px', // Aumentado padding do botão
-              backgroundColor: loading ? '#6c757d' : '#007bff', // Mudar cor durante o carregamento
+              padding: '14px', 
+              backgroundColor: loading ? '#6c757d' : '#007bff', 
               color: 'white',
               border: 'none',
-              borderRadius: '8px', // Bordas arredondadas
+              borderRadius: '8px', 
               cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '1.1rem', // Aumentado fonte
+              fontSize: '1.1rem', 
               fontWeight: 'bold',
               transition: 'background-color 0.3s ease, transform 0.2s ease',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.1)' // Sombra
+              boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
             }}
             onMouseOver={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#0056b3'; e.currentTarget.style.transform = 'translateY(-2px)'; }}}
             onMouseOut={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#007bff'; e.currentTarget.style.transform = 'translateY(0)'; }}}
