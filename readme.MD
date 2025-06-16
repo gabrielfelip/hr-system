@@ -144,4 +144,3 @@ Este projeto fornece uma base sólida para a atividade utilizando Prisma. Para u
 * **Seed de Dados:** Implementar um script de `seed` do Prisma para popular o banco de dados com dados iniciais de forma programática (ex: `prisma/seed.ts` e `npm run prisma:seed`). Isso é mais robusto do que usar um arquivo `.sql` para dados iniciais após a primeira migração.
 
 
-
