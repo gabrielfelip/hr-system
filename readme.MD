@@ -2,6 +2,10 @@
 
 Este projeto é uma aplicação web completa para gerenciamento de Recursos Humanos (RH), desenvolvida em TypeScript, utilizando Node.js com Express no backend e React no frontend. Ele inclui funcionalidades de autenticação de usuários, manutenção de senhas e operações CRUD (Create, Read, Update, Delete) para a entidade "Funcionários", com persistência de dados em PostgreSQL, **utilizando Prisma como ORM**.
 
+
+![Demonstração do Sistema RH](frontend/src/assets/hr-system.gif)
+
+
 ## Tecnologias Utilizadas
 
 * **Backend:**
@@ -139,6 +143,5 @@ Este projeto fornece uma base sólida para a atividade utilizando Prisma. Para u
 * **Docker:** Conteinerizar a aplicação (backend, frontend, PostgreSQL) para facilitar a implantação e o desenvolvimento.
 * **Seed de Dados:** Implementar um script de `seed` do Prisma para popular o banco de dados com dados iniciais de forma programática (ex: `prisma/seed.ts` e `npm run prisma:seed`). Isso é mais robusto do que usar um arquivo `.sql` para dados iniciais após a primeira migração.
 
----
 
-Espero que esta reprodução completa atenda perfeitamente à sua necessidade! Qualquer dúvida, é só me dizer.
+
